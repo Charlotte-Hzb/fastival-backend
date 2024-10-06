@@ -9,7 +9,7 @@ WORKDIR /home/node/app
 # Copier les fichiers package.json et package-lock.json pour installer les dépendances
 COPY package*.json ./
 
-# Installer les dépendances de développement (npm ci pour "clean install")
+# Installer les dépendances de développement
 RUN npm install
 
 # Construire le projet (si nécessaire)
@@ -27,8 +27,8 @@ WORKDIR /home/node/app
 # Copier les fichiers package.json et package-lock.json pour installer uniquement les dépendances de production
 COPY package*.json ./
 
-# Installer uniquement les dépendances nécessaires à la production
-RUN npm install --production
+# Installer uniquement les dépendances nécessaires à la production avec --omit=dev
+RUN npm install --omit=dev
 
 # Copier les fichiers construits de l'étape builder
 COPY --from=builder /home/node/app/dist ./dist
