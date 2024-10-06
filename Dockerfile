@@ -1,27 +1,41 @@
+# Utilisation de l'image Node
 FROM node:18.8-alpine as base
 
+# Étape de construction
 FROM base as builder
 
 WORKDIR /home/node/app
+
+# Copier les fichiers package.json et package-lock.json pour installer les dépendances
 COPY package*.json ./
 
-COPY . .
-RUN yarn install
-RUN yarn build
+# Installer les dépendances de développement (npm ci pour "clean install")
+RUN npm install
 
+# Construire le projet (si nécessaire)
+RUN npm run build
+
+# Étape de production
 FROM base as runtime
 
+# Définir l'environnement de production
 ENV NODE_ENV=production
 ENV PAYLOAD_CONFIG_PATH=dist/payload.config.js
 
 WORKDIR /home/node/app
-COPY package*.json  ./
-COPY package-lock.json ./
 
+# Copier les fichiers package.json et package-lock.json pour installer uniquement les dépendances de production
+COPY package*.json ./
+
+# Installer uniquement les dépendances nécessaires à la production
 RUN npm install --production
+
+# Copier les fichiers construits de l'étape builder
 COPY --from=builder /home/node/app/dist ./dist
 COPY --from=builder /home/node/app/build ./build
 
+# Exposer le port 3000
 EXPOSE 3000
 
+# Démarrer l'application
 CMD ["node", "dist/server.js"]
