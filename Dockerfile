@@ -2,37 +2,32 @@
 FROM node:18.8-alpine as base
 
 # Étape de construction
-FROM base as builder
-
 WORKDIR /home/node/app
 
 # Copier les fichiers package.json et package-lock.json pour installer les dépendances
 COPY package*.json ./
 
-# Installer les dépendances de développement
+# Installer les dépendances
 RUN npm install
 
-# Construire le projet (si nécessaire)
+# Copier tout le projet
+COPY . .
+
+# Construire le projet (génère le dossier dist)
 RUN npm run build
 
-# Étape de production
-FROM base as runtime
+# Étape de production (alléger l'image de production)
+FROM node:18.8-alpine as runtime
 
 # Définir l'environnement de production
 ENV NODE_ENV=production
-ENV PAYLOAD_CONFIG_PATH=dist/payload.config.js
 
 WORKDIR /home/node/app
 
-# Copier les fichiers package.json et package-lock.json pour installer uniquement les dépendances de production
-COPY package*.json ./
-
-# Installer uniquement les dépendances nécessaires à la production avec --omit=dev
-RUN npm install --omit=dev
-
-# Copier les fichiers construits de l'étape builder
-COPY --from=builder /home/node/app/dist ./dist
-COPY --from=builder /home/node/app/build ./build
+# Copier uniquement les fichiers nécessaires depuis l'étape de build
+COPY --from=base /home/node/app/package*.json ./
+COPY --from=base /home/node/app/node_modules ./node_modules
+COPY --from=base /home/node/app/dist ./dist
 
 # Exposer le port 3000
 EXPOSE 3000
