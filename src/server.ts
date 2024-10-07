@@ -11,7 +11,7 @@ const app = express();
 
 // Autoriser CORS pour toutes les origines
 app.use(cors({
-  origin: '*',  // Tu peux restreindre ceci à 'http://nationsound.000.pe' si besoin
+  origin: 'http://nationsound.000.pe',  // Tu peux restreindre ceci à 'http://nationsound.000.pe' si besoin
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
