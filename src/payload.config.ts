@@ -6,11 +6,10 @@ import { webpackBundler } from '@payloadcms/bundler-webpack'
 import { slateEditor } from '@payloadcms/richtext-slate'
 import { buildConfig } from 'payload/config'
 
-
 import Users from './collections/Users'
 import Concerts from './collections/Concerts'
 import PointsDInteret from './collections/PointsDInteret'
-const Media = require('./collections/mediaCollection');
+const Media = require('./collections/mediaCollection')
 
 export default buildConfig({
   admin: {
@@ -27,8 +26,6 @@ export default buildConfig({
   },
   plugins: [payloadCloud()],
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI,
+    url: process.env.MONGODB_URI, // S'assurer que cette variable est bien définie
   }),
 })
-
-
